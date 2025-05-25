@@ -12,7 +12,7 @@ st.set_page_config(page_title="Lambertz Bayes Kalkylator", layout="centered")
 st.image("lambertz_logo.png", width=160)
 
 st.title("Lambertz Bayesianska Kalkylator")
-st.caption("Juridisk bevisvärdering, enkelt och transparent – utvecklad med inspiration av Lambertz och Dautaj.")
+st.caption("Juridisk bevisvärdering, enkelt och transparent – utvecklad med inspiration av Lambertz.")
 
 with st.expander("💡 Vad är detta? (Klicka för info)"):
     st.write("""
