@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.lib.units import mm
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
 import io
 import os
 
@@ -174,50 +174,42 @@ st.subheader("Ladda ner rapport som PDF")
 
 def generate_pdf_reportlab(df, posterior, interpret_text):
     buffer = io.BytesIO()
-    c = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
 
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(30, height-40, "Lambertz Bayesianska Kalkylatorn – Rapport")
+    elements.append(Paragraph("Lambertz Bayesianska Kalkylatorn – Rapport", styles['Title']))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f"<b>Slutlig sannolikhet:</b> {posterior*100:.2f} %", styles['Normal']))
+    elements.append(Paragraph(f"<b>Tolkning:</b> {interpret_text}", styles['Normal']))
+    elements.append(Spacer(1, 12))
 
-    c.setFont("Helvetica", 12)
-    c.drawString(30, height-65, f"Slutlig sannolikhet: {posterior*100:.2f}%")
-    c.drawString(30, height-85, f"Tolkning: {interpret_text}")
+    # Gör om DataFrame till lista för Table
+    data = [df.columns.tolist()] + df.values.tolist()
+    table = Table(data, hAlign='LEFT')
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.lightgrey),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+        ("FONTSIZE", (0, 0), (-1, -1), 9),
+        ("BOTTOMPADDING", (0, 0), (-1, 0), 6),
+    ]))
+    elements.append(table)
 
-    # Tabellhuvud
-    c.setFont("Helvetica-Bold", 10)
-    x, y = 30, height-115
-    columns = list(df.columns)
-    col_widths = [120, 70, 70, 80, 80]
-    for col, w in zip(columns, col_widths):
-        c.drawString(x, y, str(col))
-        x += w
+    elements.append(Spacer(1, 24))
+    elements.append(Paragraph("© 2025 Orimlig Hyra | Utvecklad av Alban Dautaj", styles['Normal']))
 
-    # Tabellinnehåll
-    c.setFont("Helvetica", 10)
-    y -= 18
-    for idx, row in df.iterrows():
-        x = 30
-        for j, col in enumerate(columns):
-            c.drawString(x, y, str(row[col]))
-            x += col_widths[j]
-        y -= 15
-        if y < 60:  # Ny sida om det blir för lågt
-            c.showPage()
-            y = height-50
-
-    c.setFont("Helvetica-Oblique", 8)
-    c.drawString(30, 30, "© 2025 Orimlig Hyra | Utvecklad av Alban Dautaj")
-
-    c.save()
-    buffer.seek(0)
-    return buffer
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
 
 if st.button("Skapa PDF-rapport"):
-    pdf_buffer = generate_pdf_reportlab(df, posterior, interpret(posterior*100))
+    pdf_bytes = generate_pdf_reportlab(df, posterior, interpret(posterior*100))
     st.download_button(
         label="Ladda ner PDF",
-        data=pdf_buffer,
+        data=pdf_bytes,
         file_name="rapport.pdf",
         mime="application/pdf"
     )
