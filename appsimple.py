@@ -1,7 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import pdfkit
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.units import mm
 import io
 import os
 
@@ -169,26 +172,52 @@ st.info(f"Tolkning: **{interpret(posterior*100)}**")
 st.markdown("---")
 st.subheader("Ladda ner rapport som PDF")
 
-def generate_pdf(html, filename="rapport.pdf"):
-    config = pdfkit.configuration(wkhtmltopdf="/usr/local/bin/wkhtmltopdf")
-    pdf = pdfkit.from_string(html, False, configuration=config)
-    with open(filename, "wb") as f:
-        f.write(pdf)
-    return pdf
+def generate_pdf_reportlab(df, posterior, interpret_text):
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(30, height-40, "Lambertz Bayesianska Kalkylatorn – Rapport")
+
+    c.setFont("Helvetica", 12)
+    c.drawString(30, height-65, f"Slutlig sannolikhet: {posterior*100:.2f}%")
+    c.drawString(30, height-85, f"Tolkning: {interpret_text}")
+
+    # Tabellhuvud
+    c.setFont("Helvetica-Bold", 10)
+    x, y = 30, height-115
+    columns = list(df.columns)
+    col_widths = [120, 70, 70, 80, 80]
+    for col, w in zip(columns, col_widths):
+        c.drawString(x, y, str(col))
+        x += w
+
+    # Tabellinnehåll
+    c.setFont("Helvetica", 10)
+    y -= 18
+    for idx, row in df.iterrows():
+        x = 30
+        for j, col in enumerate(columns):
+            c.drawString(x, y, str(row[col]))
+            x += col_widths[j]
+        y -= 15
+        if y < 60:  # Ny sida om det blir för lågt
+            c.showPage()
+            y = height-50
+
+    c.setFont("Helvetica-Oblique", 8)
+    c.drawString(30, 30, "© 2025 Orimlig Hyra | Utvecklad av Alban Dautaj")
+
+    c.save()
+    buffer.seek(0)
+    return buffer
 
 if st.button("Skapa PDF-rapport"):
-    html = f"""
-    <html><body>
-    <h2>Lambertz Bayesianska Kalkylatorn – Rapport</h2>
-    <p><b>Slutlig sannolikhet:</b> {posterior*100:.2f} %<br>
-    <b>Tolkning:</b> {interpret(posterior*100)}</p>
-    {df.to_html(index=False)}
-    </body></html>
-    """
-    pdf_bytes = generate_pdf(html)
+    pdf_buffer = generate_pdf_reportlab(df, posterior, interpret(posterior*100))
     st.download_button(
         label="Ladda ner PDF",
-        data=pdf_bytes,
+        data=pdf_buffer,
         file_name="rapport.pdf",
         mime="application/pdf"
     )
