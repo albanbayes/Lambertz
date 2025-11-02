@@ -188,11 +188,11 @@ def render_lr_overlay_on_slider(unique_id: str) -> None:
 
 # --------------------------------------------------------------------------------------
 
-st.set_page_config(page_title="Lambertz Bayes Kalkylator", layout="centered")
+st.set_page_config(page_title="Bayes Kalkylator", layout="centered")
 st.image("lambertz_logo.png", width=160)
 
-st.title("Lambertz Bayesianska Kalkylator")
-st.caption("Juridisk bevisvärdering, enkelt och transparent – utvecklad med inspiration från Lambertz.")
+st.title("Bayesianska Kalkylator")
+st.caption("Juridisk bevisvärdering, enkelt och transparent – utvecklad för pågående artikel.")
 
 with st.expander("💡 Vad är detta? (Klicka för info)"):
     st.write("""
