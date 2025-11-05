@@ -220,6 +220,24 @@ MALLAR = {
         {"desc": "Jacka (saknas)",    "pba": 0.25, "pbna": 0.5},
         {"desc": "Annat",             "pba": 0.25, "pbna": 0.6}
     ],
+    "Överfallet vid tunnelbanestationen": [
+        {"desc": "Utpekandet", "pba": 0.70, "pbna": 0.15},
+        {"desc": "Klädseln", "pba": 0.80, "pbna": 0.30},
+        {"desc": "Tidsuppgift vs kamera", "pba": 0.6,  "pbna": 0.35},
+        {"desc": "Sällskap vs ensam",               "pba": 0.50, "pbna": 0.20},
+        {"desc": "Bett i handen+mer",    "pba": 0.05, "pbna": 0.2},
+        {"desc": "Skinnjacka",             "pba": 0.20, "pbna": 0.4}
+    ],
+    "Knivhugget på Kungsholmen": [
+        {"desc": "L:s utpekande av S", "pba": 0.95, "pbna": 0.05},
+        {"desc": "S:s närvaro i området vid tidpunkten", "pba": 0.95, "pbna": 0.05},
+        {"desc": "L:s tillgång till kniv", "pba": 0.7,  "pbna": 0.5},
+        {"desc": "L:s tillförlitlighet",               "pba": 0.95, "pbna": 0.01},
+        {"desc": "S:s frekventa vistelse i området",    "pba": 0.25, "pbna": 0.5},
+        {"desc": "Tipset inför konfrontationen",             "pba": 0.25, "pbna": 0.6},
+        {"desc": "R:s uteblivna iakttagelse",             "pba": 0.25, "pbna": 0.6}
+        
+    ],
     "Busshållsplatsen": [
         {"desc": "Vittnesmål 1", "pba": 0.7,  "pbna": 0.2},
         {"desc": "Vittnesmål 2", "pba": 0.7,  "pbna": 0.1},
@@ -228,6 +246,7 @@ MALLAR = {
         {"desc": "Kamera",       "pba": 0.95, "pbna": 0.3}
     ]
 }
+
 MOTBEVIS_MALLAR = {
     "Årsta torg": [
         {"desc": "Alibiuppgift", "pba": 0.3, "pbna": 0.6},
